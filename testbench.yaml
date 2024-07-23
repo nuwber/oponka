@@ -1,0 +1,22 @@
+providers:
+  - Nuwber\Oponka\OponkaServiceProvider
+
+workbench:
+  start: '/'
+  install: false
+  health: false
+  discovers:
+    web: false
+    api: false
+    commands: false
+    components: false
+    views: false
+  build: []
+  assets: []
+  sync: []
+
+dont-discover:
+  - laravel/sanctum
+  - laravel/html
+  - laravel/database
+  - laravel/framework

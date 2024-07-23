@@ -1,0 +1,29 @@
+name: Unit tests
+
+on: [push]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-versions: ['8.2', '8.3']
+    name: Testing on PHP ${{ matrix.php-versions }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: setup
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          tools: pest,composer
+
+      - name: install deps
+        run: composer install -o -q
+
+      - name: pest
+        run: ./vendor/bin/pest --coverage-clover coverage.xml
+
+      - name: Upload Codecov coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: './coverage.xml'
