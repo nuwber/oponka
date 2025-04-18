@@ -18,7 +18,7 @@ class OponkaServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '../config/oponka.php' => $this->app->configPath('oponka.php'),
+                __DIR__ . '/../config/oponka.php' => $this->app->configPath('oponka.php'),
             ], 'oponka-config');
         }
     }
@@ -47,7 +47,8 @@ class OponkaServiceProvider extends ServiceProvider
     protected function configure(): void
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/oponka.php', 'oponka'
+            __DIR__ . '/../config/oponka.php',
+            'oponka'
         );
     }
 }

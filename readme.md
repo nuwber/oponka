@@ -27,3 +27,125 @@ php artisan vendor:publish --provider="Nuwber\Oponka\OponkaServiceProvider"
 
 ### Configure the Oponka connection:
 Open the config/oponka.php file and change the connection settings as needed. Or do it with `.env` file.
+
+## Usage
+
+The primary way to interact with Oponka is through the `Oponka` facade.
+
+### Getting the Client
+
+You can access the underlying OpenSearch PHP client instance directly if needed:
+
+```php
+use Nuwber\Oponka\Facades\Oponka;
+
+$client = Oponka::client(); 
+// Now you can use the $client directly with the OpenSearch PHP client methods
+```
+
+### Indexing Documents
+
+To index a document, you can use the `index` method:
+
+```php
+use Nuwber\Oponka\Facades\Oponka;
+
+$params = [
+    'index' => 'my_index',
+    'id'    => 'my_id',
+    'body'  => ['testField' => 'abc']
+];
+
+$response = Oponka::index($params);
+
+// $response contains the OpenSearch response array
+```
+
+### Searching Documents
+
+Oponka integrates with `opensearch-dsl/opensearch-dsl`. You can build your queries using its syntax.
+
+```php
+use Nuwber\Oponka\Facades\Oponka;
+use OpenSearchDSL\Search;
+use OpenSearchDSL\Query\Compound\BoolQuery;
+use OpenSearchDSL\Query\TermLevel\TermQuery;
+use OpenSearchDSL\Query\FullText\MatchQuery;
+
+// Get the DSL Search object
+$search = Oponka::search(); // Or potentially a method to get a new Search object
+
+// Build a query
+$query = new BoolQuery();
+$query->add(new MatchQuery('title', 'laravel'));
+$query->add(new TermQuery('status', 'published'), BoolQuery::FILTER);
+
+$search->addQuery($query);
+$search->setSource(['title', 'status', 'publish_date']);
+$search->setSize(10);
+$search->setFrom(0); // for pagination
+
+// Prepare the parameters for OpenSearch
+$params = [
+    'index' => 'my_index',
+    'body' => $search->toArray(),
+];
+
+// Execute the search
+$results = Oponka::search($params); 
+
+// Process results (assuming a Result object or similar is returned)
+// foreach ($results->getHits() as $hit) {
+//     // Access hit data: $hit['_source'], $hit['_score'], etc.
+// }
+// $total = $results->getTotal();
+```
+
+*Note: The exact methods for accessing the DSL builder and processing results might differ slightly. Please refer to the source code or tests for precise implementation.*
+
+### Updating Documents
+
+Use the `update` method:
+
+```php
+use Nuwber\Oponka\Facades\Oponka;
+
+$params = [
+    'index' => 'my_index',
+    'id'    => 'my_id',
+    'body'  => [
+        'doc' => [
+            'new_field' => 'xyz'
+        ]
+    ]
+];
+
+$response = Oponka::update($params);
+```
+
+### Deleting Documents
+
+Use the `delete` method:
+
+```php
+use Nuwber\Oponka\Facades\Oponka;
+
+$params = [
+    'index' => 'my_index',
+    'id'    => 'my_id'
+];
+
+$response = Oponka::delete($params);
+```
+
+### Direct Client Access
+
+For operations not directly exposed or for more complex scenarios, you can always fall back to the native OpenSearch client:
+
+```php
+use Nuwber\Oponka\Facades\Oponka;
+
+$client = Oponka::client();
+
+$response = $client->cat()->indices(['index' => 'my_index', 'v' => true]); 
+```
