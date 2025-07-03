@@ -143,12 +143,12 @@ class AggregationBuilder
         string $alias,
         string $field,
         int $interval,
-        int $minDocCount = null,
-        string $orderMode = null,
+        ?int $minDocCount = null,
+        ?string $orderMode = null,
         string $orderDirection = 'asc',
-        int $extendedBoundsMin = null,
-        int $extendedBoundsMax = null,
-        bool $keyed = null
+        ?int $extendedBoundsMin = null,
+        ?int $extendedBoundsMax = null,
+        ?bool $keyed = null
     ): void {
         $aggregation = new HistogramAggregation(
             $alias,
@@ -253,7 +253,7 @@ class AggregationBuilder
      * @param string|null $field
      * @param string|null $script
      */
-    public function stats(string $alias, string $field = null, ?string $script = null): void
+    public function stats(string $alias, ?string $field = null, ?string $script = null): void
     {
         $this->append(new StatsAggregation($alias, $field, $script));
     }
@@ -265,7 +265,7 @@ class AggregationBuilder
      * @param string|null $field
      * @param string|null $script
      */
-    public function sum(string $alias, string $field = null, ?string $script = null): void
+    public function sum(string $alias, ?string $field = null, ?string $script = null): void
     {
         $this->append(new SumAggregation($alias, $field, $script));
     }
@@ -277,7 +277,7 @@ class AggregationBuilder
      * @param string|null $field
      * @param string|null $script
      */
-    public function valueCount(string $alias, string $field = null, ?string $script = null): void
+    public function valueCount(string $alias, ?string $field = null, ?string $script = null): void
     {
         $this->append(new ValueCountAggregation($alias, $field, $script));
     }

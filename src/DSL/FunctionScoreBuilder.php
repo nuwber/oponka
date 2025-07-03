@@ -10,7 +10,7 @@ class FunctionScoreBuilder
     /**
      * @var FunctionScoreQuery
      */
-    private FunctionScoreQuery $query;
+    private readonly FunctionScoreQuery $query;
 
     /**
      * FunctionScoreBuilder constructor.
