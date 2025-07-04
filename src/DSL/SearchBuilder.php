@@ -71,7 +71,7 @@ class SearchBuilder
      * @param Connection $connection
      * @param Query|null $grammar
      */
-    public function __construct(protected Connection $connection, Query $grammar = null)
+    public function __construct(protected Connection $connection, ?Query $grammar = null)
     {
         $this->query = $grammar ?: $connection->getDSLQuery();
     }
@@ -141,7 +141,7 @@ class SearchBuilder
      *
      * @return $this
      */
-    public function sortBy(array|string $fields, string $order = null, ?BuilderInterface $parameters = null): static
+    public function sortBy(array|string $fields, ?string $order = null, ?BuilderInterface $parameters = null): static
     {
         $fields = is_array($fields) ? $fields : [$fields];
 
