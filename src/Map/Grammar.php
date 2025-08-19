@@ -394,7 +394,7 @@ class Grammar
         $statement = [];
 
         foreach ($fields as $field) {
-            $method = 'compile' . ucfirst($field->type);
+            $method = 'compile' . ucfirst((string) $field->type);
 
             if (method_exists($this, $method)) {
                 if (!empty($map = $this->$method($field))) {

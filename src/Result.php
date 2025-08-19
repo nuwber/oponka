@@ -58,7 +58,7 @@ class Result
         $this->hits = new Collection($results['hits']['hits']);
         $this->totalHits = $results['hits']['total']['value'];
         $this->maxScore = $results['hits']['max_score'];
-        $this->aggregations = isset($results['aggregations']) ? $results['aggregations'] : [];
+        $this->aggregations = $results['aggregations'] ?? [];
     }
 
     /**

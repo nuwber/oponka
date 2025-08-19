@@ -370,7 +370,7 @@ class Blueprint
         // grammar which is used to build the necessary DSL statements to build
         // the blueprint element, so we'll just call that compilers function.
         foreach ($this->commands as $command) {
-            $method = 'compile' . ucfirst($command->name);
+            $method = 'compile' . ucfirst((string) $command->name);
 
             if (method_exists($grammar, $method)) {
                 if (!is_null($dsl = $grammar->$method($this, $command))) {

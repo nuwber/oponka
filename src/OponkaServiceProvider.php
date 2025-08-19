@@ -26,17 +26,14 @@ class OponkaServiceProvider extends ServiceProvider
     /**
      * Register the service provider.
      */
+    #[\Override]
     public function register()
     {
         $this->configure();
 
-        $this->app->singleton('oponka', function ($app) {
-            return new SearchManager($app);
-        });
+        $this->app->singleton('oponka', fn($app) => new SearchManager($app));
 
-        $this->app->singleton('oponka.connection', function ($app) {
-            return new Connection($app);
-        });
+        $this->app->singleton('oponka.connection', fn($app) => new Connection($app));
 
         AliasLoader::getInstance()->alias('Oponka', Oponka::class);
     }
