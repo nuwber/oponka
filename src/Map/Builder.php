@@ -66,7 +66,7 @@ class Builder
      *
      * @return mixed|Blueprint
      */
-    protected function createBlueprint(string $type, Closure $callback = null, $index = null): mixed
+    protected function createBlueprint(string $type, ?Closure $callback = null, $index = null): mixed
     {
         if (isset($this->resolver)) {
             return call_user_func($this->resolver, $type, $callback, $index);
