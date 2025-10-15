@@ -25,7 +25,7 @@ class Blueprint
     /**
      * Blueprint constructor.
      */
-    public function __construct(protected string $type, Closure $callback = null, protected ?string $index= null)
+    public function __construct(protected string $type, ?Closure $callback = null, protected ?string $index= null)
     {
         if (!is_null($callback)) {
             $callback($this);
