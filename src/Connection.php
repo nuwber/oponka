@@ -3,13 +3,17 @@
 namespace Nuwber\Oponka;
 
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\Arr;
 use OpenSearch\Client;
 use OpenSearch\ClientBuilder;
+use OpenSearch\Common\Exceptions\InvalidArgumentException;
+use OpenSearch\GuzzleClientFactory;
 use OpenSearch\Namespaces\IndicesNamespace;
 use OpenSearchDSL\Search as DSLQuery;
 use Nuwber\Oponka\DSL\SearchBuilder;
 use Nuwber\Oponka\Map\Builder as MapBuilder;
 use Nuwber\Oponka\Map\Grammar as MapGrammar;
+use Psr\Log\LoggerInterface;
 
 class Connection
 {
@@ -244,18 +248,13 @@ class Connection
      */
     private function buildClient(array $config): Client
     {
-        $client = ClientBuilder::create()
-            ->setHosts($config['hosts']);
-
-        if (isset($config['retries'])) {
-            $client->setRetries($config['retries']);
-        }
-
-        if (isset($config['logging']) and $config['logging']['enabled']) {
-            $client->setLogger($this->app['logger']);
-        }
-
-        return $client->build();
+        return (new GuzzleClientFactory(
+            Arr::get($config, 'retries', 0),
+            $this->getLogger($config)
+        ))->create([
+            'base_uri' => $this->getBaseUri($config),
+            'verify_peer' => Arr::get($config, 'verify_peer', false),
+        ]);
     }
 
     /**
@@ -271,5 +270,44 @@ class Connection
 
         // merge the default index with the given params if the index is not set.
         return array_merge($params, ['index' => $this->getDefaultIndex()]);
+    }
+
+    private function getLogger(array $config): ?LoggerInterface
+    {
+        if (isset($config['logging']) and $config['logging']['enabled']) {
+            return $this->app['logger'];
+        }
+
+        return null;
+    }
+
+    private function getBaseUri(array $config): string
+    {
+        if (!$baseUri = Arr::get($config, 'base_uri')) {
+            $baseUri = 'http://' . Arr::get($config, 'hosts.0');
+        }
+
+        $parts = $this->extractURIParts($baseUri);
+
+        return "{$parts['scheme']}://{$parts['host']}:{$parts['port']}";
+    }
+
+    private function extractURIParts(string $host): array
+    {
+        $parts = parse_url($host);
+
+        if ($parts === false) {
+            throw new InvalidArgumentException(sprintf('Could not parse URI: "%s"', $host));
+        }
+
+        if (isset($parts['scheme']) === false) {
+            $parts['scheme'] = 'http';
+        }
+
+        if (isset($parts['port']) === false) {
+            $parts['port'] = 9200;
+        }
+
+        return $parts;
     }
 }
